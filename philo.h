@@ -26,4 +26,13 @@ typedef struct s_args
 	int must_eat;
 }	t_args;
 
+typedef struct s_philo
+{
+	int id;
+	pthread_t t_id;
+	pthread_mutex_t fork;
+	pthread_mutex_t *next_fork;
+	t_args *args;
+}	t_philo;
+
 #endif
