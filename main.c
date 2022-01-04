@@ -66,6 +66,16 @@ void ft_put_sleep(int id)
 	printf("Philosopher %d is sleeping\n", id + 1);
 }
 
+void ft_put_think(int id)
+{
+	printf("Philosopher %d is thinking\n", id + 1);
+}
+
+void ft_put_fork(int id)
+{
+	printf("Philosopher %d Has taken a fork\n", id + 1);
+}
+
 void *philosophers(void *philo)
 {
 	int i;
@@ -74,8 +84,10 @@ void *philosophers(void *philo)
 	i = 0;
 	while (i < philosopher->args->must_eat || !(philosopher -> args -> must_eat))
 	{
+		ft_put_think(philosopher->id);
 		pthread_mutex_lock(&philosopher -> fork);
 		pthread_mutex_lock(philosopher -> next_fork);
+		ft_put_fork(philosopher->id);
 		ft_put_eat(philosopher->id);
 		usleep(philosopher->args->time_eat);
 		ft_put_sleep(philosopher->id);
@@ -83,6 +95,8 @@ void *philosophers(void *philo)
 		pthread_mutex_unlock(philosopher -> next_fork);
 		usleep(philosopher->args->time_sleep);
 		i++;
+		if (i == philosopher->args->must_eat)
+			ft_put_think(philosopher->id);
 	}
 	return NULL;
 }
