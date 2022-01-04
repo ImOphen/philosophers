@@ -12,6 +12,8 @@
 
 #include "philo.h"
 
+
+
 int	ft_atoi(const char *str)
 {
 	int	i;
@@ -44,7 +46,7 @@ int take_input(int argc,char *argv[], t_args *args)
 		return(printf("Wrong Arguments\n"),1);
 	args -> must_eat = 1;
 	args -> nb_philo = ft_atoi(argv[1]);
-	args -> time_die = ft_atoi(argv[2]) * 1000;
+	args -> time_die = ft_atoi(argv[2]);
 	args -> time_eat = ft_atoi(argv[3]) * 1000;
 	args -> time_sleep = ft_atoi(argv[4]) * 1000;
 	if (argc == 6)
@@ -56,53 +58,64 @@ int take_input(int argc,char *argv[], t_args *args)
 	return 0;
 }
 
-void ft_put_eat(int id)
+unsigned int get_time()
 {
-	printf("Philosopher %d is eating\n", id);
+	struct timeval time;
+	gettimeofday(&time, NULL);
+	return ((time.tv_sec * 1000) + (time.tv_usec / 1000));
 }
 
-void ft_put_sleep(int id)
+void ft_put_str(char *s,int id, t_args *args, int died)
 {
-	printf("Philosopher %d is sleeping\n", id);
+	pthread_mutex_lock(&args->print);
+	printf("[%u] Philosopher %d %s\n",get_time(), id, s);
+	if (!died)
+		pthread_mutex_unlock(&args->print);
 }
 
-void ft_put_think(int id)
+void *health_check(void* philo)
 {
-	printf("Philosopher %d is thinking\n", id);
-}
-
-void ft_put_fork(int id)
-{
-	printf("Philosopher %d Has taken a fork\n", id);
+	t_philo *philosopher = (t_philo *)philo;
+	while (1)
+	{
+		if (get_time() > philosopher->should_die + 10)
+		{
+			ft_put_str("is dead", philosopher->id, philosopher->args, 1);
+			philosopher->args->status = 1;
+		}
+	}
+	return (NULL);
 }
 
 void *philosophers(void *philo)
 {
 	int i;
 	t_philo *philosopher = (t_philo *)philo;
-
 	i = 0;
+	pthread_t thread_id;
+	philosopher->should_die = philosopher->args->g_time + philosopher->args->time_die;
+	pthread_create(&thread_id,NULL, &health_check, philosopher);
+	pthread_detach(thread_id);
 	while (i < philosopher->args->must_eat || !(philosopher -> args -> must_eat))
 	{
-		ft_put_think(philosopher->id);
-		if (philosopher->args->nb_philo == 1)
-			usleep(philosopher->args->time_die);
-			return(printf("philosopher %d died\n", philosopher->id), NULL);
+		ft_put_str("is thinking",philosopher->id, philosopher->args, 0);
 		pthread_mutex_lock(&philosopher -> fork);
+		ft_put_str("Has taken a fork",philosopher->id, philosopher->args, 0);
 		pthread_mutex_lock(philosopher -> next_fork);
-		ft_put_fork(philosopher->id);
-		ft_put_eat(philosopher->id);
+		ft_put_str("Has taken a fork",philosopher->id, philosopher->args, 0);
+		philosopher->should_die = get_time() + philosopher->args->time_die;
+		ft_put_str("is Eating",philosopher->id, philosopher->args, 0);
 		usleep(philosopher->args->time_eat);
-		ft_put_sleep(philosopher->id);
 		pthread_mutex_unlock(&philosopher -> fork);
 		pthread_mutex_unlock(philosopher -> next_fork);
 		usleep(philosopher->args->time_sleep);
 		i++;
 		if (i == philosopher->args->must_eat)
-			ft_put_think(philosopher->id);
+			ft_put_str("is thinking",philosopher->id, philosopher->args, 0);
 	}
 	return NULL;
 }
+
 
 int ft_create_philosophers(t_args *args)
 {
@@ -123,13 +136,20 @@ int ft_create_philosophers(t_args *args)
 			philo[i].next_fork = &philo[0].fork;
 		else
 			philo[i].next_fork = &philo[i + 1].fork;
+		i++;
+	}
+	i = 0;
+	args->g_time = get_time();
+	while(i < args -> nb_philo)
+	{
 		if (pthread_create(&philo[i].t_id,NULL, &philosophers,&philo[i]))
 			return(printf("Error occured thread creation"), 1);
+		usleep(100);
 		i++;
 	}
 	i = 0;
 	while(i < args -> nb_philo)
-		pthread_join(philo[i++].t_id, NULL);
+		pthread_detach(philo[i++].t_id);
 	return 0;
 }
 
@@ -137,10 +157,14 @@ int main(int argc, char *argv[])
 {
 	t_args args;
 
+	args.status = 0;
+	pthread_mutex_init(&args.print, NULL);
 	if (take_input(argc, argv, &args) == 1)
 		return (0);
 	if (ft_create_philosophers(&args) == 1)
 		return (0);
-	//printf("%d %d %d %d %d", args.nb_philo, args.time_die, args.time_eat, args.time_sleep, args.must_eat);
+	while (args.status == 0) {
+		usleep(10);
+	}
+	return 0;
 }
-

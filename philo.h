@@ -17,6 +17,7 @@
 # include <pthread.h>
 # include <stdlib.h>
 # include <limits.h>
+# include <sys/time.h>
 
 typedef struct s_args
 {
@@ -25,6 +26,9 @@ typedef struct s_args
 	int time_eat;
 	int time_sleep;
 	int must_eat;
+	int status;
+	pthread_mutex_t print;
+	unsigned int g_time;
 }	t_args;
 
 typedef struct s_philo
@@ -34,6 +38,7 @@ typedef struct s_philo
 	pthread_mutex_t fork;
 	pthread_mutex_t *next_fork;
 	t_args *args;
+	unsigned int should_die;
 }	t_philo;
 
 #endif
