@@ -86,6 +86,7 @@ void *philosophers(void *philo)
 	{
 		ft_put_think(philosopher->id);
 		if (philosopher->args->nb_philo == 1)
+			usleep(philosopher->args->time_die);
 			return(printf("philosopher %d died\n", philosopher->id), NULL);
 		pthread_mutex_lock(&philosopher -> fork);
 		pthread_mutex_lock(philosopher -> next_fork);
