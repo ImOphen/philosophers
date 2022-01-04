@@ -16,6 +16,7 @@
 # include <unistd.h>
 # include <pthread.h>
 # include <stdlib.h>
+# include <limits.h>
 
 typedef struct s_args
 {

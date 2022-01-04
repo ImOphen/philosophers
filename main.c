@@ -44,13 +44,15 @@ int take_input(int argc,char *argv[], t_args *args)
 		return(printf("Wrong Arguments\n"),1);
 	args -> must_eat = 1;
 	args -> nb_philo = ft_atoi(argv[1]);
-	args -> time_die = ft_atoi(argv[2]);
-	args -> time_eat = ft_atoi(argv[3]);
-	args -> time_sleep = ft_atoi(argv[4]);
+	args -> time_die = ft_atoi(argv[2]) * 1000;
+	args -> time_eat = ft_atoi(argv[3]) * 1000;
+	args -> time_sleep = ft_atoi(argv[4]) * 1000;
 	if (argc == 6)
 		args -> must_eat = ft_atoi(argv[5]);
-	if (args -> nb_philo <= 0 || args -> time_die <= 0 || args -> time_eat <= 0 || args -> time_sleep <= 0)
+	if (args -> nb_philo <= 0 || args -> time_die <= 0 || args -> time_eat <= 0 || args -> time_sleep <= 0  || args->must_eat <= 0)
 		return(printf("Wrong Arguments\n"),1);
+	if (argc == 5)
+		args -> must_eat = 0;
 	return 0;
 }
 
@@ -69,21 +71,18 @@ void *philosophers(void *philo)
 	int i;
 	t_philo *philosopher = (t_philo *)philo;
 
-	while (1)
+	i = 0;
+	while (i < philosopher->args->must_eat || !(philosopher -> args -> must_eat))
 	{
-		i = 0;
 		pthread_mutex_lock(&philosopher -> fork);
 		pthread_mutex_lock(philosopher -> next_fork);
-		while (i < philosopher->args->must_eat)
-		{
-			ft_put_eat(philosopher->id);
-			usleep(philosopher->args->time_eat);
-			i++;
-		}
+		ft_put_eat(philosopher->id);
+		usleep(philosopher->args->time_eat);
+		ft_put_sleep(philosopher->id);
 		pthread_mutex_unlock(&philosopher -> fork);
 		pthread_mutex_unlock(philosopher -> next_fork);
-		ft_put_sleep(philosopher->id);
 		usleep(philosopher->args->time_sleep);
+		i++;
 	}
 	return NULL;
 }
@@ -97,10 +96,7 @@ int ft_create_philosophers(t_args *args)
 	if (!philo)
 		return(printf("Error occured during allocation"), 1);
 	while(i < args -> nb_philo)
-	{
-			pthread_mutex_init(&philo[i].fork, NULL);
-			i++;
-	}
+			pthread_mutex_init(&philo[i++].fork, NULL);
 	i = 0;
 	while(i < args -> nb_philo)
 	{
@@ -116,10 +112,7 @@ int ft_create_philosophers(t_args *args)
 	}
 	i = 0;
 	while(i < args -> nb_philo)
-	{
-		pthread_join(philo[i].t_id, NULL);
-		i++;
-	}
+		pthread_join(philo[i++].t_id, NULL);
 	return 0;
 }
 
