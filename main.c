@@ -44,7 +44,6 @@ int take_input(int argc,char *argv[], t_args *args)
 {
 	if (argc != 6 && argc != 5)
 		return(printf("Wrong Arguments\n"),1);
-	args -> must_eat = 1;
 	args -> nb_philo = ft_atoi(argv[1]);
 	args -> time_die = ft_atoi(argv[2]);
 	args -> time_eat = ft_atoi(argv[3]) * 1000;
@@ -83,6 +82,10 @@ void *health_check(void* philo)
 			ft_put_str("is dead", philosopher->id, philosopher->args, 1);
 			philosopher->args->status = 1;
 		}
+		else if (philosopher->good == 1) {
+			philosopher->args->nbEats++;
+			break;
+		}
 	}
 	return (NULL);
 }
@@ -91,8 +94,10 @@ void *philosophers(void *philo)
 {
 	int i;
 	t_philo *philosopher = (t_philo *)philo;
-	i = 0;
 	pthread_t thread_id;
+
+	philosopher->good = 0;
+	i = 0;
 	philosopher->should_die = philosopher->args->g_time + philosopher->args->time_die;
 	pthread_create(&thread_id,NULL, &health_check, philosopher);
 	pthread_detach(thread_id);
@@ -113,6 +118,7 @@ void *philosophers(void *philo)
 		if (i == philosopher->args->must_eat)
 			ft_put_str("is thinking",philosopher->id, philosopher->args, 0);
 	}
+	philosopher->good = 1;
 	return NULL;
 }
 
@@ -158,12 +164,15 @@ int main(int argc, char *argv[])
 	t_args args;
 
 	args.status = 0;
+	args.nbEats = 0;
 	pthread_mutex_init(&args.print, NULL);
 	if (take_input(argc, argv, &args) == 1)
 		return (0);
 	if (ft_create_philosophers(&args) == 1)
 		return (0);
 	while (args.status == 0) {
+		if (args.nbEats == args.nb_philo)
+			break ;
 		usleep(10);
 	}
 	return 0;

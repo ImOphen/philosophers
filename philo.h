@@ -29,10 +29,12 @@ typedef struct s_args
 	int status;
 	pthread_mutex_t print;
 	unsigned int g_time;
+	int			nbEats;
 }	t_args;
 
 typedef struct s_philo
 {
+	int		good;
 	int id;
 	pthread_t t_id;
 	pthread_mutex_t fork;
