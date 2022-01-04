@@ -58,22 +58,22 @@ int take_input(int argc,char *argv[], t_args *args)
 
 void ft_put_eat(int id)
 {
-	printf("Philosopher %d is eating\n", id + 1);
+	printf("Philosopher %d is eating\n", id);
 }
 
 void ft_put_sleep(int id)
 {
-	printf("Philosopher %d is sleeping\n", id + 1);
+	printf("Philosopher %d is sleeping\n", id);
 }
 
 void ft_put_think(int id)
 {
-	printf("Philosopher %d is thinking\n", id + 1);
+	printf("Philosopher %d is thinking\n", id);
 }
 
 void ft_put_fork(int id)
 {
-	printf("Philosopher %d Has taken a fork\n", id + 1);
+	printf("Philosopher %d Has taken a fork\n", id);
 }
 
 void *philosophers(void *philo)
@@ -85,6 +85,8 @@ void *philosophers(void *philo)
 	while (i < philosopher->args->must_eat || !(philosopher -> args -> must_eat))
 	{
 		ft_put_think(philosopher->id);
+		if (philosopher->args->nb_philo == 1)
+			return(printf("philosopher %d died\n", philosopher->id), NULL);
 		pthread_mutex_lock(&philosopher -> fork);
 		pthread_mutex_lock(philosopher -> next_fork);
 		ft_put_fork(philosopher->id);
@@ -114,7 +116,7 @@ int ft_create_philosophers(t_args *args)
 	i = 0;
 	while(i < args -> nb_philo)
 	{
-		philo[i].id = i;
+		philo[i].id = i + 1;
 		philo[i].args = args;
 		if (i == args->nb_philo - 1)
 			philo[i].next_fork = &philo[0].fork;
@@ -140,3 +142,4 @@ int main(int argc, char *argv[])
 		return (0);
 	//printf("%d %d %d %d %d", args.nb_philo, args.time_die, args.time_eat, args.time_sleep, args.must_eat);
 }
+
