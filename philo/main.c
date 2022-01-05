@@ -35,7 +35,7 @@ void	*philosophers(void *philo)
 	pthread_t	thread_id;
 
 	philosopher = (t_philo *)philo;
-	philosopher->good = 0;
+	philosopher->philosopher_eat_max = 0;
 	i = 0;
 	philosopher->should_die = philosopher->args->g_time
 		+ philosopher->args->time_die;
@@ -49,7 +49,7 @@ void	*philosophers(void *philo)
 		if (i == philosopher->args->must_eat)
 			ft_put_str("is thinking", philosopher->id, philosopher->args, 0);
 	}
-	philosopher->good = 1;
+	philosopher->philosopher_eat_max = 1;
 	return (NULL);
 }
 
@@ -105,9 +105,9 @@ int	main(int argc, char *argv[])
 
 	args.status = 0;
 	args.nbeats = 0;
-	pthread_mutex_init(&args.print, NULL);
 	if (take_input(argc, argv, &args) == 1)
 		return (0);
+	pthread_mutex_init(&args.print, NULL);
 	philo = ft_create_philosophers(&args);
 	if (philo == NULL)
 		return (0);
@@ -120,6 +120,7 @@ int	main(int argc, char *argv[])
 	i = 0;
 	while (i < args.nb_philo)
 		pthread_mutex_destroy(&philo[i++].fork);
+	pthread_mutex_destroy(&args.print);
 	free(philo);
 	return (0);
 }

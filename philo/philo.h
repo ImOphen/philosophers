@@ -34,7 +34,7 @@ typedef struct s_args
 
 typedef struct s_philo
 {
-	int					good;
+	int					philosopher_eat_max;
 	int					id;
 	pthread_t			t_id;
 	pthread_mutex_t		fork;

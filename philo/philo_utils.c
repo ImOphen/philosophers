@@ -86,7 +86,7 @@ void	*health_check(void *philo)
 			ft_put_str("died", philosopher->id, philosopher->args, 1);
 			philosopher->args->status = 1;
 		}
-		else if (philosopher->good == 1)
+		else if (philosopher->philosopher_eat_max == 1)
 		{
 			philosopher->args->nbeats++;
 			break ;
