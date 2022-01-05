@@ -34,12 +34,12 @@ typedef struct s_args
 
 typedef struct s_philo
 {
-	int					philosopher_eat_max;
 	int					id;
 	pthread_t			t_id;
 	pthread_mutex_t		fork;
 	pthread_mutex_t		*next_fork;
 	t_args				*args;
+	int					philosopher_eat_max;
 	unsigned int		should_die;
 }	t_philo;
 
