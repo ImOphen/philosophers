@@ -70,7 +70,7 @@ void	fill_philo(t_philo *philo, t_args *args)
 	}
 }
 
-int	ft_create_philosophers(t_args *args)
+t_philo	*ft_create_philosophers(t_args *args)
 {
 	t_philo	*philo;
 	int		i;
@@ -78,7 +78,7 @@ int	ft_create_philosophers(t_args *args)
 	i = 0;
 	philo = malloc(sizeof(t_philo) * args -> nb_philo);
 	if (!philo)
-		return (printf("Error occured during allocation"), 1);
+		return (printf("Error occured during allocation"), NULL);
 	while (i < args -> nb_philo)
 		pthread_mutex_init(&philo[i++].fork, NULL);
 	i = 0;
@@ -87,26 +87,29 @@ int	ft_create_philosophers(t_args *args)
 	while (i < args -> nb_philo)
 	{
 		if (pthread_create(&philo[i].t_id, NULL, &philosophers, &philo[i]))
-			return (printf("Error occured thread creation"), 1);
+			return (free(philo), printf("Error occured thread creation"), NULL);
 		usleep(100);
 		i++;
 	}
 	i = 0;
 	while (i < args -> nb_philo)
 		pthread_detach(philo[i++].t_id);
-	return (0);
+	return (philo);
 }
 
 int	main(int argc, char *argv[])
 {
 	t_args	args;
+	t_philo	*philo;
+	int		i;
 
 	args.status = 0;
 	args.nbeats = 0;
 	pthread_mutex_init(&args.print, NULL);
 	if (take_input(argc, argv, &args) == 1)
 		return (0);
-	if (ft_create_philosophers(&args) == 1)
+	philo = ft_create_philosophers(&args);
+	if (philo == NULL)
 		return (0);
 	while (args.status == 0)
 	{
@@ -114,5 +117,9 @@ int	main(int argc, char *argv[])
 			break ;
 		usleep(10);
 	}
+	i = 0;
+	while (i < args.nb_philo)
+		pthread_mutex_destroy(&philo[i++].fork);
+	free(philo);
 	return (0);
 }
