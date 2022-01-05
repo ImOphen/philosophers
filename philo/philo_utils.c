@@ -66,12 +66,11 @@ unsigned int	get_time(void)
 	return ((time.tv_sec * 1000) + (time.tv_usec / 1000));
 }
 
-void	ft_put_str(char *s, int id, t_args *args, int died)
+void	ft_put_str(char *s, int id, t_args *args)
 {
 	pthread_mutex_lock(&args->print);
-	printf("%u %d %s\n", get_time(), id, s);
-	if (!died)
-		pthread_mutex_unlock(&args->print);
+	printf("%u %d %s\n", get_time() - args->g_time, id, s);
+	pthread_mutex_unlock(&args->print);
 }
 
 void	*health_check(void *philo)
@@ -81,9 +80,10 @@ void	*health_check(void *philo)
 	philosopher = (t_philo *)philo;
 	while (1)
 	{
-		if (get_time() > philosopher->should_die + 9)
+		if (get_time() > philosopher->should_die + 8)
 		{
-			ft_put_str("died", philosopher->id, philosopher->args, 1);
+			ft_put_str("died", philosopher->id, philosopher->args);
+			pthread_mutex_lock(&philosopher->args->print);
 			philosopher->args->status = 1;
 		}
 		else if (philosopher->philosopher_eat_max == 1)

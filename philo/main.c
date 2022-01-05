@@ -14,17 +14,17 @@
 
 void	philosophers_activities(t_philo *philosopher)
 {
-	ft_put_str("is thinking", philosopher->id, philosopher->args, 0);
+	ft_put_str("is thinking", philosopher->id, philosopher->args);
 	pthread_mutex_lock(&philosopher -> fork);
-	ft_put_str("has taken a fork", philosopher->id, philosopher->args, 0);
+	ft_put_str("has taken a fork", philosopher->id, philosopher->args);
 	pthread_mutex_lock(philosopher -> next_fork);
-	ft_put_str("has taken a fork", philosopher->id, philosopher->args, 0);
+	ft_put_str("has taken a fork", philosopher->id, philosopher->args);
 	philosopher->should_die = get_time() + philosopher->args->time_die;
-	ft_put_str("is eating", philosopher->id, philosopher->args, 0);
+	ft_put_str("is eating", philosopher->id, philosopher->args);
 	usleep(philosopher->args->time_eat);
 	pthread_mutex_unlock(&philosopher -> fork);
 	pthread_mutex_unlock(philosopher -> next_fork);
-	ft_put_str("is sleeping", philosopher->id, philosopher->args, 0);
+	ft_put_str("is sleeping", philosopher->id, philosopher->args);
 	usleep(philosopher->args->time_sleep);
 }
 
@@ -47,7 +47,7 @@ void	*philosophers(void *philo)
 		philosophers_activities(philosopher);
 		i++;
 		if (i == philosopher->args->must_eat)
-			ft_put_str("is thinking", philosopher->id, philosopher->args, 0);
+			ft_put_str("is thinking", philosopher->id, philosopher->args);
 	}
 	philosopher->philosopher_eat_max = 1;
 	return (NULL);

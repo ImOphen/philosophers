@@ -47,6 +47,6 @@ typedef struct s_philo
 int					ft_atoi(const char *str);
 int					take_input(int argc, char *argv[], t_args *args);
 unsigned int		get_time(void);
-void				ft_put_str(char *s, int id, t_args *args, int died);
+void				ft_put_str(char *s, int id, t_args *args);
 void				*health_check(void *philo);
 #endif
