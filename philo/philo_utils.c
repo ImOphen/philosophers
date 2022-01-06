@@ -45,12 +45,12 @@ int	take_input(int argc, char *argv[], t_args *args)
 	args -> must_eat = 1;
 	args -> nb_philo = ft_atoi(argv[1]);
 	args -> time_die = ft_atoi(argv[2]);
-	args -> time_eat = ft_atoi(argv[3]) * 1000;
-	args -> time_sleep = ft_atoi(argv[4]) * 1000;
+	args -> time_eat = ft_atoi(argv[3]);
+	args -> time_sleep = ft_atoi(argv[4]);
 	if (argc == 6)
 		args -> must_eat = ft_atoi(argv[5]);
-	if (args -> nb_philo <= 0 || args -> time_die <= 0
-		|| args -> time_eat <= 0 || args -> time_sleep <= 0
+	if (args -> nb_philo <= 0 || args->nb_philo > 200 || args -> time_die <= 59
+		|| args -> time_eat <= 59 || args -> time_sleep <= 59
 		|| args->must_eat <= 0)
 		return (printf("Wrong Arguments\n"), 1);
 	if (argc == 5)
@@ -80,7 +80,7 @@ void	*health_check(void *philo)
 	philosopher = (t_philo *)philo;
 	while (1)
 	{
-		if (get_time() > philosopher->should_die + 8)
+		if (get_time() >= philosopher->should_die + 5)
 		{
 			ft_put_str("died", philosopher->id, philosopher->args);
 			pthread_mutex_lock(&philosopher->args->print);

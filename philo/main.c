@@ -21,11 +21,11 @@ void	philosophers_activities(t_philo *philosopher)
 	ft_put_str("has taken a fork", philosopher->id, philosopher->args);
 	philosopher->should_die = get_time() + philosopher->args->time_die;
 	ft_put_str("is eating", philosopher->id, philosopher->args);
-	usleep(philosopher->args->time_eat);
+	usleep(philosopher->args->time_eat * 1000);
 	pthread_mutex_unlock(&philosopher -> fork);
 	pthread_mutex_unlock(philosopher -> next_fork);
 	ft_put_str("is sleeping", philosopher->id, philosopher->args);
-	usleep(philosopher->args->time_sleep);
+	usleep(philosopher->args->time_sleep * 1000);
 }
 
 void	*philosophers(void *philo)
@@ -88,7 +88,7 @@ t_philo	*ft_create_philosophers(t_args *args)
 	{
 		if (pthread_create(&philo[i].t_id, NULL, &philosophers, &philo[i]))
 			return (free(philo), printf("Error occured thread creation"), NULL);
-		usleep(100);
+		usleep(10);
 		i++;
 	}
 	i = 0;
@@ -115,7 +115,7 @@ int	main(int argc, char *argv[])
 	{
 		if (args.nbeats == args.nb_philo)
 			break ;
-		usleep(10);
+		usleep(50);
 	}
 	i = 0;
 	while (i < args.nb_philo)
